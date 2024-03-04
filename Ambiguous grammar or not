@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Function to check LR(1) parsing table for conflicts
+bool isAmbiguous(int parsingTable[][5]) {
+    // Check for conflicts in the parsing table
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            if (parsingTable[i][j] < 0) {
+                // Conflict detected (reduce-reduce or shift-reduce conflict)
+                return true;
+            }
+        }
+    }
+    // No conflicts found
+    return false;
+}
+
+int main() {
+    // Example LR(1) parsing table
+    int parsingTable[6][5] = {
+        {1, -1, -1, 2, 3},
+        {-1, 4, 5, -1, -1},
+        {6, -1, -1, -1, -1},
+        {-1, -1, -1, 7, 8},
+        {-1, 9, 10, -1, -1},
+        {-1, -1, -1, -1, -1}
+   };
+
+    // Check for ambiguity
+    if (isAmbiguous(parsingTable)) {
+        printf("Grammar is ambiguous.\n");
+    } else {
+        printf("Grammar is not ambiguous.\n");
+    }
+    return 0;
+}
+output:
+Grammar is not an ambiguous grammar
