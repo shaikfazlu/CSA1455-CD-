@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// SLR Parsing Table
+int parsingTable[6][5] = {
+    {1, -1, -1, 2, 3},
+    {-1, 4, 5, -1, -1},
+    {6, -1, -1, -1, -1},
+    {-1, -1, -1, 7, 8},
+    {-1, 9, 10, -1, -1},
+    {-1, -1, -1, -1, -1}
+};
+
+void parseSLR(const char *input) {
+    int stack[1000]; // Stack for state numbers
+    int top = -1;
+    stack[++top] = 0; // Initial state
+
+    int inputIndex = 0;
+    while (input[inputIndex] != '\0') {
+        int currentState = stack[top];
+        char currentSymbol = input[inputIndex];
+
+        // Find the action in the parsing table
+        int action = parsingTable[currentState][currentSymbol - 'E'];
+
+        if (action > 0) {
+            // Shift operation
+            stack[++top] = currentSymbol - 'E';
+            stack[++top] = action;
+            inputIndex++;
+        } else if (action < 0) {
+            // Reduce operation
+            int production = -action;
+            int reduceLength = strlen("E") - 1; // Assuming single-character non-terminal
+
+            // Pop twice for each symbol in the production
+            for (int i = 0; i < 2 * reduceLength; ++i) {
+                top--;
+            }
+
+            // Push the non-terminal on the stack
+            int nextState = parsingTable[stack[top]][production - 'E'];
+            stack[++top] = production - 'E';
+            stack[++top] = nextState;
+        } else {
+            // Error or invalid input
+            printf("Error: Invalid input\n");
+            return;
+        }
+    }
+
+    if (stack[top] == 1) {
+        printf("Input accepted\n");
+    } else {
+        printf("Error: Invalid input\n");
+    }
+}
+
+int main() {
+    const char *input = "id + id * id";
+    parseSLR(input);
+
+    return 0;
+}
+
+output:
+S -> E
+E -> E + T | T
+T -> T * F | F
+F -> ( E ) | id
